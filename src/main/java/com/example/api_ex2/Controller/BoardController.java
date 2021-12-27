@@ -15,6 +15,17 @@ import java.util.List;
 public class BoardController {
     private BoardService boardService;
 
+
+    //게시글 검색
+    @GetMapping("/board/search")
+    public String search(@RequestParam(value = "keyword") String keyword, Model model) {
+        List<BoardDto> boardDtoList = boardService.searchPosts(keyword);
+
+        model.addAttribute("boardList",boardDtoList);
+
+        return "board/list.html";
+    }
+
     //게시글 상세조회 페이지
     @GetMapping("/post/{no}")
     public String detail(@PathVariable("no") Long no, Model model){
@@ -49,14 +60,27 @@ public class BoardController {
         return "redirect:/";
     }
 
-    @GetMapping("/")
+    //게시글 조회
+/*    @GetMapping("/")
     public String list(Model model) {
         List<BoardDto> boardList = boardService.getBoardlist();
 
         model.addAttribute("boardList", boardList);
         return "board/list.html";
+    }*/
+
+    //게시글 목록으로 조회
+    @GetMapping("/")
+    public String list(Model model, @RequestParam(value = "page", defaultValue = "1")Integer pageNum) {
+        List<BoardDto> boardList = boardService.getBoardlist(pageNum);
+        Integer[] pageList = boardService.getPageList(pageNum);
+
+        model.addAttribute("pageList", pageList);
+        model.addAttribute("boardList", boardList);
+        return "board/list.html";
     }
 
+    //게시글 등록
     @GetMapping("/post")
     public String write(){
         return "board/write.html";
